@@ -1,4 +1,6 @@
-import org.apache.tools.ant.taskdefs.Expand
+import java.util.zip.ZipFile
+import java.nio.file.Paths
+import java.nio.file.Files
 
 // Define a custom task to prepare the environment
 task prepareEnvironment {
@@ -20,11 +22,11 @@ task prepareEnvironment {
             // Download the zip file from Nexus
             ant.get(src: zipUrl, dest: file("$buildDir/$zipFileName"))
 
-            // Unzip the downloaded file to the target directory
-            def expand = new Expand()
-            expand.src = file("$buildDir/$zipFileName")
-            expand.dest = targetDir
-            expand.execute()
+            // Extract the downloaded zip file
+            project.copy {
+                from(zipTree("$buildDir/$zipFileName"))
+                into(targetDir)
+            }
 
             // Copy files to a particular folder
             copy {
